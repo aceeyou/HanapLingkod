@@ -47,6 +47,10 @@ const Requests = () => {
     }, [])
 
     useEffect(() => {
+        fetchRequestList()        
+    }, [isFocused])
+
+    useEffect(() => {
         let reqReq = setInterval(fetchRequestList, 15000)
         return () => {
             clearInterval(reqReq)

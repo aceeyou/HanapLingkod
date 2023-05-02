@@ -106,7 +106,7 @@ export default function Registration({route}) {
     const [cameraPersmission, setCameraPermission] = useState()
     const [microphonePersmission, setMicrophonePermission] = useState()
     const [medialibraryPersmission, setMedialibraryPermission] = useState()
-    const [videoCountdown, setVideoCountdown] = useState(10)
+    const [videoCountdown, setVideoCountdown] = useState(11)
 
     const [showRecordVideo, setShowRecordVideo] = useState(false)
     const [showRecordVideoModal, setShowRecordVideoModal] = useState(false)
@@ -127,7 +127,7 @@ export default function Registration({route}) {
     useEffect(() => {
       setisConfirmed(false)
       setShowRecordVideo(false)
-      setVideoCountdown(10)
+      setVideoCountdown(11)
 
     }, [isFocused]);
 
@@ -170,7 +170,7 @@ export default function Registration({route}) {
         setShowDialog(false)
       }
     }, [next]);
-
+stopRecording
 
     const startRecording = () => {
       setIsRecording(true)
@@ -188,7 +188,7 @@ export default function Registration({route}) {
           clearInterval(tim)
           setIsRecording(false)
           setShowRecordVideo(false)
-          setVideoCountdown(10)
+          setVideoCountdown(11)
           cameraRef.current.stopRecording()
       }
 
@@ -206,6 +206,8 @@ export default function Registration({route}) {
 
     const stopRecording = () => {
       setIsRecording(false)
+      setShowRecordVideo(false)
+      setVideoCountdown(10)
       cameraRef.current.stopRecording()
     }
 
@@ -1185,7 +1187,7 @@ export default function Registration({route}) {
 
                         <View style={{alignItems:'center', flexDirection:"row", alignItems: 'center', justifyContent:"center", position: 'absolute', bottom: 20, width: '100%'}}>
                           <TouchableOpacity style={{backgroundColor:'white', paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', borderRadius: 15}}
-                            onPress={()=> isRecording ? null : startRecording()}
+                            onPress={()=> isRecording ? stopRecording() : startRecording()}
                           >
                             <Icon name="video-box" size={17} color={isRecording ? "$434343" : ThemeDefaults.themeRed} />
                             <TText style={{fontSize: 14, marginLeft: 5, color: '#434343'}}>{isRecording ? videoCountdown : "Start Record"}</TText>

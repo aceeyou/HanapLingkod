@@ -27,7 +27,10 @@ const PostRequests = () => {
 
   const [postRequestList, setPostRequestList] = useState([])
 
+  const [page, setPage] = useState(1)
+
   useEffect(() => {
+    setPage(1)
     fetchRequestPosts()
   },[])
 
@@ -72,7 +75,7 @@ const PostRequests = () => {
 
     try {
         await fetch(
-          `https://hanaplingkod.onrender.com/request-post/${postID}`, {
+          `https://hanaplingkod.onrender.com/request-post/${postID}?page=${page}`, {
             method: "PUT",
             headers: {
               'content-type': 'application/json',
@@ -275,6 +278,8 @@ const PostRequests = () => {
           data={postRequestList}
           keyExtractor={item => item._id}
           estimatedItemSize={60}
+          onEndReachedThreshold={0.3}
+          onEndReached={() => setPage(prev => prev + 1)}
           // ListEmptyComponent={() => (<renderIfEmpty />)}
           ListHeaderComponent={() => (
             <ScreenHeaderComponent />

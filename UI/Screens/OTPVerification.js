@@ -67,28 +67,28 @@ export default function OTPVerification(props) {
         setotpNum({n1: "", n2: "", n3: "", n4: "", n5: "", n6: "",})
         setStartTimer(true)
 
-        // sendVerification();
+        sendVerification();
 
-        navigation.navigate("CreateAccountLoading", {
-            phoneNum: phoneNum, 
-            role: role, 
-            user: user, 
-            singleImage: singleImage, 
-            image: image, 
-            token: token,
-            isLogin: isLogin, 
-            work: work, 
-            imagelicense: imagelicense, 
-            fromWelcome: fromWelcome, 
-            forgotPassword: forgotPassword,
-            fromEditUserInfo: fromEditUserInfo, 
-            formDataUserInfo: formDataUserInfo, 
-            formDataPastWorks: formDataPastWorks, 
-            formDataSetOfWorks: formDataSetOfWorks, 
-            workList: workList,
-            video: video
-        })
-    },[route.phoneNum])
+        // navigation.navigate("CreateAccountLoading", {
+        //     phoneNum: phoneNum, 
+        //     role: role, 
+        //     user: user, 
+        //     singleImage: singleImage, 
+        //     image: image, 
+        //     token: token,
+        //     isLogin: isLogin, 
+        //     work: work, 
+        //     imagelicense: imagelicense, 
+        //     fromWelcome: fromWelcome, 
+        //     forgotPassword: forgotPassword,
+        //     fromEditUserInfo: fromEditUserInfo, 
+        //     formDataUserInfo: formDataUserInfo, 
+        //     formDataPastWorks: formDataPastWorks, 
+        //     formDataSetOfWorks: formDataSetOfWorks, 
+        //     workList: workList,
+        //     video: video
+        // })
+    },[isFocused])
 
     // update resend otp code countdown timer
     useEffect(() => {

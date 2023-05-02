@@ -46,7 +46,7 @@ function Home() {
 
     const fetchWorkerVerified = async () => {
         try {
-            await fetch(`https://hanaplingkod.onrender.com/worker`, {
+            await fetch(`https://hanaplingkod.onrender.com/worker?page=100`, {
                 method: 'GET',
                 headers: {
                     'content-type': "application/json",

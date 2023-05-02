@@ -42,10 +42,10 @@ const UsersView = () => {
 
     const fetchUserData = async (role) => {
         // role == boolean
-        let userRole = role ? "recruiter" : "worker"
+        let userRole = role ? "recruiter" : "Worker"
         
         try {
-            await fetch(`https://hanaplingkod.onrender.com/${userRole}`, {
+            await fetch(`https://hanaplingkod.onrender.com/${userRole}?page=100`, {
                 method: 'GET',
                 headers: {
                     'content-type': "application/json",
