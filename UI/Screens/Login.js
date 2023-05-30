@@ -76,8 +76,8 @@ export default function Login({navigation}) {
             
             setIsLoading(false)
             setUser({username: "", password: ""});
-            navigation.navigate("HomeStack");
-            // handleGoToOTP(user.phoneNumber)
+            // navigation.navigate("HomeStack");
+            handleGoToOTP(user.phoneNumber)
 
           } else {
             setIsLoading(false)

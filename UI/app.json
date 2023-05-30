@@ -2,9 +2,9 @@
   "expo": {
     "name": "HanapLingkod",
     "slug": "hanaplingkod",
-    "version": "1.0.91",
+    "version": "1.1.3",
     "orientation": "portrait",
-    "icon": "./assets/logo/hanaplingkod_icon_5.png",
+    "icon": "./assets/logo/hanaplingkod__icon_xdpi.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/logo/hanaplingkod_iconfull.png",
@@ -22,18 +22,20 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo/hanaplingkod_icon_5.png",
+        "foregroundImage": "./assets/logo/hanaplingkod__icon_xdpi.png",
         "backgroundColor": "#FFFFFF"
       },
       "useNextNotificationsApi": true,
       "permissions": [
-        "android.permissoin.READ_EXTERNAL_STORAGE"
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ],
       "package": "com.team4g.hanaplingkod",
       "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/logo/hanaplingkod_icon_5.png"
+      "favicon": "./assets/logo/hanaplingkod__icon_xdpi.png"
     },
     "plugins": [
       [
@@ -46,9 +48,16 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/logo/hanaplingkod_icon_5.png",
+          "icon": "./assets/logo/hanaplingkod__icon_xdpi.png",
           "color": "#2080ff",
           "sounds": []
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow HanapLingkod to access your camera.",
+          "microphonePermission" : "Allow HanapLingkod to access your microphone."
         }
       ],
       "@react-native-firebase/app"

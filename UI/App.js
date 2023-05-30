@@ -67,32 +67,7 @@ export default function App() {
         setNotification(notification);
         console.log("new notification")
       });
-
-    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-    // responseListener.current =
-    //   Notifications.addNotificationResponseReceivedListener((response) => {
-    //     let resNotif = response.notification
-    //     console.log("notification response: ", response.notification);
-
-    //     // turn notification.read to true 
-    //     fetch("http://" + IPAddress + ":3000/notification/" + global.deviceExpoPushToken, {
-    //       method: "PUT",
-    //       headers: {
-    //         'content-type': 'application/json',
-    //       },
-    //     }).then(() => console.log("all notification read"))
-    //     .catch((error) => console.log("notification app js error: ", error.message))
-
-        
-
-    //     // go to convo
-    //     // navigation.navigate("CompletedBookingsDrawer")
-
-    //     // go to request/booking page
-
-
-    //     // fetch(/request/id || /booking/id)
-    //   });
+    
     
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -103,67 +78,93 @@ export default function App() {
     });
     
 
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
+    // return () => {
+    //   Notifications.removeNotificationSubscription(notificationListener.current);
+    //   Notifications.removeNotificationSubscription(responseListener.current);
+    // };
+
+    return () => { 
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+    
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
     };
   }, []);
 
-  // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
-async function sendPushNotification(expoPushToken) {
-  // set message here
-  const message = {
-    to: expoPushToken,
-    sound: "default",
-    title: "HANAPLINGKOD",
-    body: "San ka Punta?",
-    data: { someData: "Welcome to HanapLingkod" },
-  };
 
-  // send to server
-  // await fetch("https://exp.host/--/api/v2/push/send", {
-  //   method: "POST",
-  //   headers: {
-  //     Accept: "application/json",
-  //     "Accept-encoding": "gzip, deflate",
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify(message),
-  // });
+// async function registerForPushNotificationsAsync() {
+//   let token;
 
-}
+//   if (Platform.OS === 'android') {
+//     await Notifications.setNotificationChannelAsync('default', {
+//       name: 'default',
+//       importance: Notifications.AndroidImportance.MAX,
+//       vibrationPattern: [0, 250, 250, 250],
+//       lightColor: '#FF231F7C',
+//     });
+//   }
+  
+//   if (Device.isDevice) {
+//     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+//     let finalStatus = existingStatus;
+
+//     if (existingStatus !== 'granted') {
+//         const { status } = await Notifications.requestPermissionsAsync();
+//         finalStatus = status;
+//     }
+//     if (finalStatus !== 'granted') {
+//         alert('Failed to get push token for push notification!');
+//         return;
+//     }
+//     token = (await Notifications.getExpoPushTokenAsync()).data;
+//   }
+
+//     if (Platform.OS === 'android') {
+//       Notifications.setNotificationChannelAsync('default', {
+//         name: 'default',
+//         importance: Notifications.AndroidImportance.MAX,
+//         vibrationPattern: [0, 250, 250, 250],
+//         lightColor: '#FF231F7C',
+//       });
+//     }
+
+//     return token;
+
+// }
 
 async function registerForPushNotificationsAsync() {
   let token;
-  
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.requestPermissionsAsync();
-    let finalStatus = existingStatus;
 
-    if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
   }
 
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getDevicePushTokenAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
     }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
 
-    return token;
-
+  return token;
 }
 
   return (

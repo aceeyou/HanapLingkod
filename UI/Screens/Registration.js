@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView, View, Text, TextInput, TouchableOpacity, 
   Image, Button, StyleSheet, StatusBar, ScrollView, Modal, 
-  Platform, Dimensions, BackHandler, InteractionManager } from 'react-native';
+  Platform, Dimensions, BackHandler, PermissionsAndroid } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -29,7 +29,7 @@ import OTPVerification from './OTPVerification';
 import DialogueModal from '../Components/DialogueModal';
 
 import { Camera, CameraType } from 'expo-camera'
-import { Video } from 'expo-av'
+import { Video, Audio } from 'expo-av'
 
 const WIDTH = Dimensions.get('window').width
 const HEIGHT = Dimensions.get('window').height
@@ -106,28 +106,106 @@ export default function Registration({route}) {
     const [cameraPersmission, setCameraPermission] = useState()
     const [microphonePersmission, setMicrophonePermission] = useState()
     const [medialibraryPersmission, setMedialibraryPermission] = useState()
-    const [videoCountdown, setVideoCountdown] = useState(11)
+    const [videoCountdown, setVideoCountdown] = useState(5)
 
     const [showRecordVideo, setShowRecordVideo] = useState(false)
     const [showRecordVideoModal, setShowRecordVideoModal] = useState(false)
+
+    // multi ID images
+    const [image, setImage] = useState([]);
+    //single ID image
+    const [singleImage, setSingleImage] = useState('');
+
+    // multi license images
+    const [imagelicense, setLicenseImage] = useState([]);
+    //single license image
+    const [imageSingleLicense, setSingleLicenseImage] = useState('');
+
+    const [statusImagePickerUseLibraryPermission, setImagePickerUserPermission] = ImagePicker.useMediaLibraryPermissions();
+
+
+    const [isPriceGreater, setIsPriceGreater] = useState(true)
+    useEffect(() => {
+      // console.log("hp", services[0].highestPrice)
+      if(services[0].highestPrice > services[0].lowestPrice){
+        setIsPriceGreater(true)
+      } else {
+        setIsPriceGreater(false)
+      }
+    }, [services[0].lowestPrice, services[0].highestPrice])
+
+    useEffect(() => {
+      const requesPermission = async () => {
+        if (Platform.OS !== "web") {
+          const { status } =
+            // await ImagePicker.useMediaLibraryPermissions();
+            await ImagePicker.requestCameraPermissionsAsync();
+            // setImagePickerUserPermission(ImagePicker.useMediaLibraryPermissions())
+          if (status !== "granted") {
+            alert("Sorry, we need camera roll permissions to make this work!");
+          }
+        }
+      }
+      // (async () => {
+      //   if (Platform.OS !== "web") {
+      //     const { status } =
+      //       // await ImagePicker.useMediaLibraryPermissions();
+      //       await ImagePicker.requestCameraPermissionsAsync();
+      //       // setImagePickerUserPermission(ImagePicker.useMediaLibraryPermissions())
+      //     if (status !== "granted") {
+      //       alert("Sorry, we need camera roll permissions to make this work!");
+      //     }
+      //   }
+      // })();
+      requesPermission()
+
+    }, []);
 
     const cameraRef = useRef()
 
     useEffect(() => {
       (async () => {
-        const cameraPersmission = await Camera.requestCameraPermissionsAsync()
-        const mircrophonePermission = await Camera.requestMicrophonePermissionsAsync()
+        let mircrophonePermission = Camera.getMicrophonePermissionsAsync()
+        let cameraPersmission = Camera.useCameraPermissions()
+
+        if(microphonePersmission.status !== 'granted'){
+          await Audio.requestPermissionsAsync();
+          Camera.requestMicrophonePermissionsAsync()
+        }
+
+        if(cameraPersmission.status !== 'granted'){
+          cameraPersmission = await Camera.requestCameraPermissionsAsync()
+        }
 
         setCameraPermission(cameraPersmission.status === 'granted')
         setMicrophonePermission(mircrophonePermission.status === 'granted')
-      })()
+
+        const micReq = await PermissionsAndroid.request(
+          PermissionsAndroid.RECORD_AUDIO,
+          {
+            title: "HanapLingkod Microphone Permisson",
+            message: "HanapLingkod wants to access the microphone",
+            buttonPositive: "Okay"
+          }
+        )
+
+        if (micReq === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('You can use the camera');
+          alert("Microphone Permission Grandted")
+        } else {
+          console.log('Camera permission denied');
+          alert("Microphone Permission Rejected")
+        }
+      })().catch(err => {
+        console.log(err)
+      })
     }, []);
 
 
     useEffect(() => {
       setisConfirmed(false)
       setShowRecordVideo(false)
-      setVideoCountdown(11)
+      setVideoCountdown(5)
 
     }, [isFocused]);
 
@@ -170,44 +248,44 @@ export default function Registration({route}) {
         setShowDialog(false)
       }
     }, [next]);
-stopRecording
+// stopRecording
 
     const startRecording = () => {
       setIsRecording(true)
       console.log("recording...")
       let options = {
         quality: "480p",
-        maxDuration: 10,
-        mute: true,
+        maxDuration: 5,
+        mute: false
       }
 
-      
-      const tim = setInterval(() => setVideoCountdown(prev => prev - 1), 1000)
-      
-      if(Number(videoCountdown) === 0){
+      // if(Number(videoCountdown) === 0){
+      if(videoCountdown === 0){
           clearInterval(tim)
           setIsRecording(false)
           setShowRecordVideo(false)
-          setVideoCountdown(11)
+          setVideoCountdown(5)
           cameraRef.current.stopRecording()
       }
+      const tim = setInterval(() => setVideoCountdown(prev => prev - 1), 1000)
 
-      cameraRef.current.recordAsync(options)
+      cameraRef?.current.recordAsync(options)
         .then((recordedVideo) => {
-          console.log("recorded video")
+          console.log("video recorded")
           clearInterval(tim)
           setVideo(recordedVideo)
           setIsRecording(false)
           setShowRecordVideo(false)
-          setVideoCountdown(10)
-        })
-      
+          setVideoCountdown(5)
+        }).catch(err => {
+          alert(`Can't record video at the moment - ${err.message}`);
+        })  
     }
 
     const stopRecording = () => {
       setIsRecording(false)
       setShowRecordVideo(false)
-      setVideoCountdown(10)
+      setVideoCountdown(5)
       cameraRef.current.stopRecording()
     }
 
@@ -224,11 +302,6 @@ stopRecording
       if(today.getMonth() < bday.getMonth() || (today.getMonth() === bday.getMonth() && today.getDate() < bday.getDate())){
         age = age - 1
       }
-      // console.log("age: ", age)
-      // handleSetAge(age)
-
-      // console.log("age > 18: ", (yearNow - userAge) > 18)
-      // setUser((prev) => ({...prev, age: age}))
 
       return age > 17
     }
@@ -458,55 +531,6 @@ stopRecording
     };
 
     // OPEN IMAGE PICKER
-    // multi ID images
-    const [image, setImage] = useState([]);
-    //single ID image
-    const [singleImage, setSingleImage] = useState('');
-
-    // multi license images
-    const [imagelicense, setLicenseImage] = useState([]);
-    //single license image
-    const [imageSingleLicense, setSingleLicenseImage] = useState('');
-
-    const [statusImagePickerUseLibraryPermission, setImagePickerUserPermission] = ImagePicker.useMediaLibraryPermissions();
-
-
-    const [isPriceGreater, setIsPriceGreater] = useState(true)
-    useEffect(() => {
-      // console.log("hp", services[0].highestPrice)
-      if(services[0].highestPrice > services[0].lowestPrice){
-        setIsPriceGreater(true)
-      } else {
-        setIsPriceGreater(false)
-      }
-    }, [services[0].lowestPrice, services[0].highestPrice])
-
-    useEffect(() => {
-      const requesPermission = async () => {
-        if (Platform.OS !== "web") {
-          const { status } =
-            // await ImagePicker.useMediaLibraryPermissions();
-            await ImagePicker.requestCameraPermissionsAsync();
-            // setImagePickerUserPermission(ImagePicker.useMediaLibraryPermissions())
-          if (status !== "granted") {
-            alert("Sorry, we need camera roll permissions to make this work!");
-          }
-        }
-      }
-      // (async () => {
-      //   if (Platform.OS !== "web") {
-      //     const { status } =
-      //       // await ImagePicker.useMediaLibraryPermissions();
-      //       await ImagePicker.requestCameraPermissionsAsync();
-      //       // setImagePickerUserPermission(ImagePicker.useMediaLibraryPermissions())
-      //     if (status !== "granted") {
-      //       alert("Sorry, we need camera roll permissions to make this work!");
-      //     }
-      //   }
-      // })();
-      requesPermission()
-
-    }, []);
 
     const pickImage = async () => {
 
@@ -1186,11 +1210,13 @@ stopRecording
                       <Camera style={{backgroundColor: 'gray', width: '100%', height: 550, marginTop: 50}} ref={cameraRef} type={CameraType.front}>
 
                         <View style={{alignItems:'center', flexDirection:"row", alignItems: 'center', justifyContent:"center", position: 'absolute', bottom: 20, width: '100%'}}>
-                          <TouchableOpacity style={{backgroundColor:'white', paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', borderRadius: 15}}
+                          <TouchableOpacity 
+                            disabled={isRecording}
+                            style={{backgroundColor:'white', paddingVertical: 5, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', borderRadius: 15}}
                             onPress={()=> isRecording ? stopRecording() : startRecording()}
                           >
                             <Icon name="video-box" size={17} color={isRecording ? "$434343" : ThemeDefaults.themeRed} />
-                            <TText style={{fontSize: 14, marginLeft: 5, color: '#434343'}}>{isRecording ? videoCountdown : "Start Record"}</TText>
+                            <TText style={{fontSize: 14, marginLeft: 5, color: '#434343'}}>{isRecording ? (videoCountdown > 0 ? videoCountdown : "0") : "Start Record"}</TText>
                           </TouchableOpacity>
                         </View>
                       </Camera>
